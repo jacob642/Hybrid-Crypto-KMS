@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtualenv
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+
+# Keys and keystore
+KMS/master.key
+keys/private.pem
+keystore.enc
+
+# Logs and runtime
+*.log
+*.sqlite3
+
+# OS
+.DS_Store
+Thumbs.db
