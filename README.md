@@ -1,77 +1,143 @@
 # Hybrid-Crypto-KMS
-This project is a practical implementation of hybrid encryption and key management in Python. It uses Fernet which provides AES 128 CBC with HMAC SHA256 for fast authenticated encryption and RSA OAEP to securely wrap the symmetric key. Alongside the crypto logic it includes a small Key Management System that stores keys in an encrypted keystore tracks metadata rotates master keys and supports key revocation.
 
-I built this during my internship as a way to understand how secure systems actually manage keys behind the scenes. It helped me move beyond simple encryption examples and into the full lifecycle of key creation storage rotation and revocation.
+A compact, hands-on Key Management Service (KMS) and hybrid encryption demo written in Python. Built during an internship to deepen my practical understanding of applied cryptography, this project demonstrates envelope encryption (RSA-OAEP wrapping of Fernet session keys), a local encrypted keystore, and basic key lifecycle operations such as rotation and revocation. It is designed for learning and portfolio use.
 
-What the Project Does
-Hybrid Encryption
-The encryption process works like this
+## Project Overview
 
-A Fernet key is generated
-The Fernet key is encrypted using RSA OAEP
-The message is encrypted using the Fernet key
-The Fernet key is stored securely in the KMS
-Decryption reverses the process
+Hybrid-Crypto-KMS is an educational implementation that shows how common key management patterns map to working code. The project focuses on clarity and separation of concerns so you can follow the cryptographic flow and the keystore lifecycle without getting lost in infrastructure details.
 
-This mirrors how many real systems combine symmetric and asymmetric encryption.
+### Core ideas demonstrated
 
-Key Management System
-The KMS handles
+- Envelope encryption with RSA-OAEP for key wrapping and Fernet for authenticated symmetric encryption.
+- A local KMS that stores keys encrypted under a master key and tracks metadata for auditing.
+- Key lifecycle operations including generate, import/export, rotate, and revoke.
+- Clean separation between crypto primitives and key management logic.
 
-Creating and storing a master key
-Encrypting and saving keys in a keystore
-Tracking metadata such as creation time last access and revocation
-Rotating the master key
-Revoking keys
-Logging actions to an audit log
+## Features
 
-Sensitive files such as RSA keys the master key and logs are ignored through the gitignore file.
+- Hybrid encryption using RSA for key encryption and Fernet for message encryption.
+- Encrypted keystore protected by a master key stored on disk.
+- Metadata and audit logging for creation time, last access, and revocation events.
+- Key rotation that replaces the master key and re-encrypts the keystore.
+- Key revocation that marks keys as revoked and removes them from the keystore.
+- Minimal CLI demo to exercise encrypt, decrypt, rotate, and revoke flows.
 
-Project Structure
-Code
-Hybrid Crypto KMS
-    Hybrid AES RSA.py        Hybrid encryption and decryption logic
-    KMS.py                   Key management system
-    main.py                  CLI runner
-    keys                     RSA keys ignored
-    KMS                      Keystore master key metadata audit log
-    gitignore
-    LICENSE
-    README.md
-How to Run
-Install dependencies
+## Quick Start
 
-pip install r requirements.txt
+Clone the repository:
 
-Run the main program
+```bash
+git clone <repo-url>
+cd Hybrid-Crypto-KMS
+```
 
+Create and activate a virtual environment.
+
+**macOS / Linux**
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+**Windows PowerShell**
+
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+Install the dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the demo:
+
+```bash
 python main.py
+```
 
-The program will
+### Try the following
 
-Set up the KMS
-Generate RSA keys if needed
-Generate a Fernet key and store it
-Encrypt your message
-Decrypt it again
-Rotate the master key
-Ask whether you want to revoke the key
+- Enter a message to encrypt.
+- Verify decryption using the stored key.
+- Rotate the master key and confirm the keystore is re-encrypted.
+- Revoke a key and confirm it can no longer be loaded.
 
-It is a simple flow but it covers the full lifecycle.
+## Usage Examples
 
-Internship Context
-I built this during my internship to get hands on experience with hybrid encryption key storage and protection rotation and revocation audit logging and structuring a complete security tool. It helped me understand how secure systems behave beyond basic encryption examples.
+### Encrypt a message
 
-Possible Improvements
-There are several things I would improve if I continued working on this
+Run `python main.py`, enter a message, and the application will generate an encrypted token along with an RSA-wrapped Fernet key.
 
-Use stronger RSA keys such as 4096 bit
-Improve separation of modules
-Add better error handling with custom exceptions
-Write unit tests for encryption decryption rotation and revocation
-Allow configurable storage paths instead of fixed directories
-Support multiple key types
-Add optional post quantum support
-Replace the simple input prompts with a proper command line interface
+### Decrypt a message
 
-These changes would make the project more robust and closer to something used in production
+The demo loads the wrapped key from the keystore and decrypts the message using the RSA private key and recovered Fernet key.
+
+### Rotate the master key
+
+Use the rotation option to generate a new master key and re-encrypt the keystore.
+
+### Revoke a key
+
+Revoke a stored key and verify that future attempts to load it raise an error.
+
+## Improvements & Next Steps
+
+Some practical improvements that could be made in the future include:
+
+- Replace RSA with a post-quantum KEM such as Kyber (ML-KEM).
+- Use HKDF for key derivation when using a KEM.
+- Add support for algorithm negotiation and migration between RSA and post-quantum encryption.
+- Store the master key in an operating system keystore or HSM instead of a local file.
+- Introduce role-based access controls.
+- Expand audit logging with user identity and request information.
+- Improve testing and CI/CD.
+- Benchmark encryption performance.
+- Add a migration guide and threat model documentation.
+
+## Repository Structure
+
+```text
+Hybrid-Crypto-KMS/
+├── README.md
+├── main.py
+├── Hybrid_AES_RSA.py
+├── KMS/
+│   ├── key_manager.py
+│   ├── keystore.enc
+│   ├── metadata.json
+│   └── master.key
+└── keys/
+    ├── private.pem
+    └── public.pem
+```
+
+## Important
+
+The following files contain sensitive material and should **never** be committed:
+
+- `KMS/master.key`
+- `keys/private.pem`
+
+Add them to your `.gitignore`.
+
+## Tests
+
+Recommended unit tests include:
+
+- Keystore save/load using the master key.
+- Store and retrieve keys through the KMS API.
+- Master key rotation without data loss.
+- Key revocation and metadata updates.
+- Encryption/decryption round trips.
+- Future migration tests for RSA → post-quantum KEM.
+
+`pytest` is recommended for testing.
+
+
+## Final Notes
+
+This repository is intended as a learning project to explore hybrid encryption and key management in Python. It demonstrates how envelope encryption and basic KMS concepts work together in practice and provides a foundation for experimenting with more advanced cryptographic techniques in the future.
