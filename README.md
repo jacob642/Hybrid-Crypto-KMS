@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 Hybrid-Crypto-KMS
 A compact, hands‑on Key Management Service and hybrid encryption demo written in Python. Built during an internship to deepen practical understanding of applied cryptography, this project demonstrates envelope encryption (RSA‑OAEP wrapping of Fernet session keys), a local encrypted keystore, and basic key lifecycle operations such as rotation and revocation. It is designed for learning and portfolio use.
 
